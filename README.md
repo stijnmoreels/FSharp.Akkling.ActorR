@@ -8,7 +8,58 @@ Especially if you want to set up a pipeline, this could be a problem for readabi
 One of my attempts was to create an higher-level language in which we can express functions in terms of **Actors**; that's what the ```ActorR``` module is all about.
 
 ## Reader Module
-All the functions exposed in the ```ActorR``` uses the ```Reader Monad``` to have a latter-initialization of the actual Actor system; so we can specify the actual system at the very last with ```Reader.run sys```.
+All the functions exposed in the ```ActorR``` uses the _Reader Monad_ to have a latter-initialization of the actual Actor system; so we can specify the actual system at the very last with ```Reader.run sys```.
 
 ## Integration Patterns
 Now that you have an introduction into the two major modules, I'll show you the combinations of these systems.
+
+### Introduction with Filter
+One of the frequently used _Integration Patterns_, is the _Filter Pattern_. This is the implementation of this filter:
+
+```fsharp
+/// Actor Filter: filters incoming message before sending it to the next Actor.
+/// ## Parameters
+///  - `f` - A predicate to filter the incoming message for the next Actor.
+///  - `next` - The next Actor in line to handle the message.
+let filter f next = askSysOf <| function
+    | x  when f x -> next <! x |> ignored
+    | _ -> unhandled ()
+```
+    
+Just for your information, the ```askSysOf``` is a helper function that lets me use the _Reader_ functionality to ask for a Actor system:
+
+```fsharp
+let private askSys a = Reader.ask <| fun sys ->
+    spawnAnonymous sys <| props a
+
+let private askSysOf fn = askSys <| actorOf fn
+```
+
+Now let's write a test to verify this so you can see it in practice:
+
+```fsharp
+[<Property>]
+let ``Message gets passed by Actor if filter satisfy condition`` (i : int) =
+    testDefault <| fun tck ->
+        ActorR.filter (fun _ -> true)
+        =<< ActorR.spy ()
+        |> Reader.run tck
+        |> Actor.tell i
+
+        expectMsg tck i |> ignore
+
+[<Property>]
+let ``Message gets dropped by Actor if filter doesn't satisfy condition`` (i : int) =
+    testDefault <| fun tck ->
+        ActorR.filter (fun _ -> false)
+        =<< ActorR.spy ()
+        |> Reader.run tck
+        |> Actor.tell i
+
+        expectNoMsg |> ignore
+```
+
+- The ```ActorR.spy ()``` call is just a creation function for the _TestKit TestActor_ but in a ```ActorR``` context.
+- The ```Actor.tell``` call is a alias for the ```<!``` infix operator.
+
+You can see that we reversed bindings (```=<<```), I've created a pipeline in which the order of execution is from top to bottom (and not the way arround).
