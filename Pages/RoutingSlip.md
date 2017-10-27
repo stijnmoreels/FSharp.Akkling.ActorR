@@ -42,19 +42,19 @@ Here's how you would test it:
 type Route = A | B | C
 
 [<Property>]
-let ``Routing Slip is being used as route`` (list : Route list) =
+let ``Routing Slip is being used as route`` (m : int) (list : Route list) =
     testDefault <| fun tck ->        
         ActorR.slip (fun _ -> ActorR.echo tck)
         =<< ActorR.spy ()
         |> Reader.run tck
-        |> Actor.tell { Routing = list; History = []; Message = 0 }
+        |> Actor.tell { Routing = list; History = []; Message = m }
 
         list 
         |> List.mapi (fun i _ -> 
             let index = i + 1
             { Routing = list |> List.skip index
               History = list |> List.take index |> List.rev
-              Message = 0 })
+              Message = m })
         |> expectMsgAllOf tck
         |> ignore
 ```
