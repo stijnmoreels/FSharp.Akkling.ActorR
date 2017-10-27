@@ -7,6 +7,12 @@ Especially if you want to set up a pipeline, this could be a problem for readabi
 
 One of my attempts was to create an higher-level language in which we can express functions in terms of **Actors**; that's what the ```ActorR``` module is all about.
 
+Here's all the different _Integration Patterns_ I tried to implement with _Akka.NET_ Actors (and the F# _Akkling_ extension):
+
+* [Content Enricher/Message Translater](Pages/Map.md)
+* [Idempotent Receiver](Pages/Dedup.md)
+* [Wire Tap](Pages/Tap.md)
+
 ## Reader Module
 All the functions exposed in the ```ActorR``` uses the _Reader Monad_ to have a latter-initialization of the actual Actor system; so we can specify the actual system at the very last with ```Reader.run sys```.
 
