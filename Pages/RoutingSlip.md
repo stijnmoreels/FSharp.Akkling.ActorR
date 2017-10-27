@@ -38,3 +38,23 @@ Now, the ```slip``` function needs a ```lookup``` function that's used to determ
 
 Here's how you would test it:
 
+```fsharp
+type Route = A | B | C
+
+[<Property>]
+let ``Routing Slip is being used as route`` (list : Route list) =
+    testDefault <| fun tck ->        
+        ActorR.slip (fun _ -> ActorR.echo tck)
+        =<< ActorR.spy ()
+        |> Reader.run tck
+        |> Actor.tell { Routing = list; History = []; Message = 0 }
+
+        list 
+        |> List.mapi (fun i _ -> 
+            let index = i + 1
+            { Routing = list |> List.skip index
+              History = list |> List.take index |> List.rev
+              Message = 0 })
+        |> expectMsgAllOf tck
+        |> ignore
+```
