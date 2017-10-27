@@ -4,6 +4,23 @@ For now, I've created a _Switch_ that switches between two actors, this could be
 
 Here's the implementation:
 
+```fsharp
+/// Actor Switch: incoming messages will be routed to two destinations switching from left to right with every incoming message.
+/// ## Parameters
+///  - `left` - The left destination to where the incoming message will be routed.
+///  - `right` - The right destination to where the incoming messages will be routed.
+let rec switch leftR rightR = askSys <| fun ctx ->
+    let leftA = run ctx leftR
+    let rightA = run ctx rightR
+
+    let rec switchFunc left right = actor {
+        let! x = ctx.Receive ()
+        left <! x
+        return! switchFunc right left }
+
+    switchFunc leftA rightA
+```
+
 And here's how I would test this:
 
 ```fsharp
