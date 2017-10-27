@@ -12,6 +12,7 @@ Here's all the different _Integration Patterns_ I tried to implement with _Akka.
 * [Content Enricher/Message Translater](Pages/Map.md)
 * [Idempotent Receiver](Pages/Dedup.md)
 * [Wire Tap](Pages/Tap.md)
+* [Routing Switch](Pages/Switch.md)
 
 ## Reader Module
 All the functions exposed in the ```ActorR``` uses the _Reader Monad_ to have a latter-initialization of the actual Actor system; so we can specify the actual system at the very last with ```Reader.run sys```.
