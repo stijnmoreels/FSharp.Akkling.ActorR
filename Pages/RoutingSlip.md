@@ -58,3 +58,6 @@ let ``Routing Slip is being used as route`` (m : int) (list : Route list) =
         |> expectMsgAllOf tck
         |> ignore
 ```
+
+The ```ActorR.echo``` function is an alias for the _Akka.NET_ echo functionality. 
+This way; we can also inspect the intermediate messages that gets send back and forth between the _Routing Slip_ and the _Echo_.
