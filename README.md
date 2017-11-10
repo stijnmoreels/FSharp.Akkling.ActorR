@@ -15,7 +15,7 @@ Here's all the different _Integration Patterns_ I tried to implement with _Akka.
 * [Routing Switch](Pages/Switch.md)
 * [Splitter](Pages/Splitter.md)
 * [Aggregator](Pages/Aggregator.md)
-* [Resequencer](Pages/Resequencer.md)
+* [Resequencer](Pages/Reseq.md)
 
 ## Reader Module
 All the functions exposed in the ```ActorR``` uses the _Reader Monad_ to have a latter-initialization of the actual Actor system; so we can specify the actual system at the very last with ```Reader.run sys```.
