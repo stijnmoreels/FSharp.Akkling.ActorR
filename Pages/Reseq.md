@@ -41,20 +41,24 @@ let waitForAll expect actual =
     else None
 
 [<Property>]
-let ``Message gets resequenced in the right order`` (length : PositiveInt) =
-    [1..length.Get]
+let ``Message gets resequenced in the right order`` (range : Interval) =
+    [range.Left..range.Right]
     |> Gen.shuffle
     |> Gen.map Array.toList
     |> Arb.fromGen
     |> Prop.forAll <| fun expect ->
         testDefault <| fun tck ->
-            ActorR.reseq 1 compareTo add1
+            ActorR.reseq range.Left compareTo add1
             <=< ActorR.aggregate (waitForAll expect)
             =<< ActorR.spy' ()
             |> Reader.run tck
             |> Actor.tellAll expect
 
-            expectMsg tck (expect |> List.sort |> List.rev) |> ignore
+            expect
+            |> List.sort
+            |> List.rev
+            |> expectMsg tck
+            |> ignore
 ```
 
 It's a possible solution to check if the message arrive correctly if we use also the _Aggregator_ to combine all the messages before sending it further.
