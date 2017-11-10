@@ -48,25 +48,22 @@ let private askSysOf fn = askSys <| actorOf fn
 Now let's write a test to verify this so you can see it in practice:
 
 ```fsharp
+let expect tck pred m =
+    match pred with
+    | true -> expectMsg tck m |> ignore
+    | false -> expectNoMsg |> ignore
+
 [<Property>]
-let ``Message gets passed by Actor if filter satisfy condition`` (i : int) =
+let ``Message gets passed by Actor if filter satisfy condition`` 
+    (retn : bool) 
+    (i : int) =
     testDefault <| fun tck ->
-        ActorR.filter (fun _ -> true)
-        =<< ActorR.spy ()
+        ActorR.filter (fun _ -> retn)
+        =<< ActorR.spy' ()
         |> Reader.run tck
         |> Actor.tell i
 
-        expectMsg tck i |> ignore
-
-[<Property>]
-let ``Message gets dropped by Actor if filter doesn't satisfy condition`` (i : int) =
-    testDefault <| fun tck ->
-        ActorR.filter (fun _ -> false)
-        =<< ActorR.spy ()
-        |> Reader.run tck
-        |> Actor.tell i
-
-        expectNoMsg |> ignore
+        expect tck retn i |> ignore
 ```
 
 - The ```ActorR.spy ()``` call is just a creation function for the _TestKit TestActor_ but in a ```ActorR``` context.
