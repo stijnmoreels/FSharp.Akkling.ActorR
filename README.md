@@ -33,7 +33,7 @@ One of the frequently used _Integration Patterns_, is the _Filter Pattern_. This
 ///  - `next` - The next Actor in line to handle the message.
 let filter f next = askSysOf <| function
     | x  when f x -> next <! x |> ignored
-    | _ -> unhandled ()
+    | _ -> ignored ()
 ```
     
 Just for your information, the ```askSysOf``` is a helper function that lets me use the _Reader_ functionality to ask for a Actor system:
